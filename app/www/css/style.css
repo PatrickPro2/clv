@@ -1,0 +1,21 @@
+.skin-blue .main-header .logo {
+  background-color: #0a1c2a;
+  position: fixed;
+  width: 230px;
+}
+
+.skin-blue .main-header .navbar {
+  background-color: #0a1c2a;
+  position: fixed;
+}
+
+.skin-blue .main-sidebar {
+  background-color: #0a1c2a;
+  position: fixed;
+  width: 230px;
+}
+
+.content-wrapper, .right-side {
+  background-color: #0a1c2a;
+  height: 2200px !important;
+}
