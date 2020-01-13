@@ -73,4 +73,5 @@ getInit1stOrderCohort <- function(){
 # order.table.describe <- fread("../data/order_table_describe.csv")
 # first.second <- fread("../data/first_second.csv")
 first.order.time.item <- fread("../data/first_order_time_item.csv")
+first.order.time.item$txn.date.cohort <- as.character(first.order.time.item$txn.date.cohort)
 purchase.drifting <- fread("../data/purchase_drifting.csv")
