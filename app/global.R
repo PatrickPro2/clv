@@ -48,12 +48,6 @@ source("modules/clv_trend.R")
 source("modules/clv_1st_order_cohort.R")
 source("modules/instruction.R")
 
-
-# order.table <- getData('xingkeduo', date.range=list(gte="2017-01-01", lte="2017-06-01"), txn.amount=list(gte=0, lte=1000), other=unlist(attributes))
-
-# Disconnect database driver
-# lapply(dbListConnections(PostgreSQL()), function(x) dbDisconnect(x))
-
 customized.theme <- hc_theme(
   colors = c("#00818A", "#F7BE16", "#F76262", "#6B778D"),
   chart = list(backgroundColor = NULL),
