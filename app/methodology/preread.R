@@ -16,6 +16,7 @@
 # retention.data <- retention.data[month != max(retention.data$month)]
 
 order.detail.table <- fread("../data/demo_order_detail1.csv")
+order.table <- fread('../data/demo_order_table1.csv')
 retention.data <- fread("../data/demo_retention_db1.csv")
 
 getOrderTableTxn <- function(){
@@ -73,6 +74,3 @@ order.table.describe <- fread("../data/order_table_describe.csv")
 first.second <- fread("../data/first_second.csv")
 first.order.time.item <- fread("../data/first_order_time_item.csv")
 purchase.drifting <- fread("../data/purchase_drifting.csv")
-
-
-

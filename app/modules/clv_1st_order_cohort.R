@@ -40,6 +40,8 @@ clv1stOrderCohort <- function(input, output, session, clv.model.fitting.output, 
     detail$txn.date <- as.Date(detail$txn.date)
     detail <- detail[, .N, by=.(customer.id, txn.date, item.name)]
     select.first.order.detail <- detail[detail[, .(txn.date=min(txn.date)), by=.(customer.id)], on=c("customer.id", "txn.date")]
+    fwrite(select.first.order.detail,'../data/select.first.order.detail.csv')
+    fwrite(clv.selected, '../data/clv.selected.csv')
     setnames(select.first.order.detail, old=c("txn.date"), new=c("first.txn.date"))
     select.first.order.detail.clv <- select.first.order.detail[clv.selected, on=c("customer.id", "first.txn.date")]
     first.order.detail.clv$sum <- select.first.order.detail.clv[order(clv.by.attribute), .(clv=round(sum(clv),0)), by=.(clv.by.attribute, item.name)][item.name %in% input$itemName]
@@ -51,6 +53,7 @@ clv1stOrderCohort <- function(input, output, session, clv.model.fitting.output, 
         first.order.detail.clv$mean <- first.order.detail.clv$mean[clv.by.attribute %in% selected.cohort]
       }
     }
+    
   })
 
   # 不同首单月不同商品总CLV

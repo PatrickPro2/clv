@@ -12,8 +12,7 @@ sidebar <- dashboardSidebar(
     ),
     menuItem(text = "CLV", tabName = "clvInsight", icon = icon("chart-line"), startExpanded = TRUE,
       menuSubItem(text = "Model Fitting", tabName = "clvModelFitting"),
-      menuSubItem(text = "CLV Trend", tabName = "clvTrend"),
-      menuSubItem(text = "CLV x First Transaction", tabName = "clv1stOrderCohort")
+      menuSubItem(text = "CLV Trend", tabName = "clvTrend")
     )
   )
 )
@@ -27,8 +26,7 @@ body <- dashboardBody(
     tabItem(tabName = "initRetentionInsight", bootstrapPage(htmlTemplate(filename = "www/html/index.html", page = initRetentionInsightUI("page3")))),
     tabItem(tabName = "initRfmInsight", bootstrapPage(htmlTemplate(filename = "www/html/index.html", page = initRfmInsightUI("page4")))),
     tabItem(tabName = "clvModelFitting", bootstrapPage(htmlTemplate(filename = "www/html/index.html", page = clvModelFittingUI("page5")))),
-    tabItem(tabName = "clvTrend", bootstrapPage(htmlTemplate(filename = "www/html/index.html", page = clvTrendUI("page6")))),
-    tabItem(tabName = "clv1stOrderCohort", bootstrapPage(htmlTemplate(filename = "www/html/index.html", page = clv1stOrderCohortUI("page7"))))
+    tabItem(tabName = "clvTrend", bootstrapPage(htmlTemplate(filename = "www/html/index.html", page = clvTrendUI("page6"))))
   )
 )
 

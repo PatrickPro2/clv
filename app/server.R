@@ -5,5 +5,5 @@ server <- function(input, output, session) {
   callModule(initRfmInsight, "page4", order.table.describe, first.second.table)
   clv.model.fitting.output <- callModule(clvModelFitting, "page5", order.table)
   callModule(clvTrend, "page6", clv.model.fitting.output)
-  callModule(clv1stOrderCohort, "page7", clv.model.fitting.output, order.detail.table)
+  # callModule(clv1stOrderCohort, "page7", clv.model.fitting.output, order.detail.table)
 }
