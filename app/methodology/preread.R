@@ -1,19 +1,22 @@
-attributes <- list("产品SKU" = "item.name", "产品数量" = "item.number", "产品原价" = "item.original.price", "产品摊销价" = "item.amortized.price", "商品ID" = "item.name.id")
-all.attributes <- append(list("首单周期" = "first.txn.time"), attributes)
-order.detail.table <- fread('../data/demo_order_detail.csv')
-colnames(order.detail.table) <- gsub("_", ".", colnames(order.detail.table))
-order.detail.table <- order.detail.table[, c("customer.id", "txn.id", "txn.time", "txn.amount", unlist(attributes)), with=FALSE]
-order.detail.table <- order.detail.table[order(customer.id, txn.time, txn.id)]
-order.detail.table$txn.time <- as.POSIXct(order.detail.table$txn.time)
-order.detail.table$txn.date <- as.Date(order.detail.table$txn.time)
-order.detail.table$txn.year.month <- format(order.detail.table$txn.date, "%Y%m")
+# attributes <- list("产品SKU" = "item.name", "产品数量" = "item.number", "产品原价" = "item.original.price", "产品摊销价" = "item.amortized.price", "商品ID" = "item.name.id")
+# all.attributes <- append(list("首单周期" = "first.txn.time"), attributes)
+# order.detail.table <- fread('../data/demo_order_detail.csv')
+# colnames(order.detail.table) <- gsub("_", ".", colnames(order.detail.table))
+# order.detail.table <- order.detail.table[, c("customer.id", "txn.id", "txn.time", "txn.amount", unlist(attributes)), with=FALSE]
+# order.detail.table <- order.detail.table[order(customer.id, txn.time, txn.id)]
+# order.detail.table$txn.time <- as.POSIXct(order.detail.table$txn.time)
+# order.detail.table$txn.date <- as.Date(order.detail.table$txn.time)
+# order.detail.table$txn.year.month <- format(order.detail.table$txn.date, "%Y%m")
+# 
+# order.table <- order.detail.table[, .(txn.date=min(txn.date), customer.id=first(customer.id), txn.amount=mean(txn.amount)), by=.(txn.id)]
+# order.table$txn.year.month <- format(order.table$txn.date, "%Y%m")
+# order.table <- order.table[order(customer.id, txn.date, txn.id)]
+# order.table[, `:=`(sequence=seq_len(.N)), by=.(customer.id)]
+# retention.data <- fread("../data/demo_retention_db.csv")
+# retention.data <- retention.data[month != max(retention.data$month)]
 
-order.table <- order.detail.table[, .(txn.date=min(txn.date), customer.id=first(customer.id), txn.amount=mean(txn.amount)), by=.(txn.id)]
-order.table$txn.year.month <- format(order.table$txn.date, "%Y%m")
-order.table <- order.table[order(customer.id, txn.date, txn.id)]
-order.table[, `:=`(sequence=seq_len(.N)), by=.(customer.id)]
-retention.data <- fread("../data/demo_retention_db.csv")
-retention.data <- retention.data[month != max(retention.data$month)]
+order.detail.table <- fread("../data/demo_order_detail1.csv")
+retention.data <- fread("../data/demo_retention_db1.csv")
 
 getOrderTableTxn <- function(){
   last.date <- as.Date(max(order.table$txn.date))
@@ -60,8 +63,16 @@ getInit1stOrderCohort <- function(){
   return(list(first.order.time.item = first.order.time.item, purchase.drifting = purchase.drifting))
 }
 
-order.table.describe <- getOrderTableTxn()
-first.second <- getFirstSecond()
-result <- getInit1stOrderCohort()
-first.order.time.item <- result$first.order.time.item
-purchase.drifting <- result$purchase.drifting
+# order.table.describe <- getOrderTableTxn()
+# first.second <- getFirstSecond()
+# result <- getInit1stOrderCohort()
+# first.order.time.item <- result$first.order.time.item
+# purchase.drifting <- result$purchase.drifting
+
+order.table.describe <- fread("../data/order_table_describe.csv")
+first.second <- fread("../data/first_second.csv")
+first.order.time.item <- fread("../data/first_order_time_item.csv")
+purchase.drifting <- fread("../data/purchase_drifting.csv")
+
+
+
