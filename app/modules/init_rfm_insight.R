@@ -4,14 +4,14 @@ initRfmInsightUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(div(
-      column(width = 12, selectInput(inputId = ns("recencyCohort"), label = "首单月", choices = sort(unique(order.table.describe$month)), multiple = TRUE, selected = min(order.table.describe$month), width = "100%"))
+      column(width = 12, selectInput(inputId = ns("recencyCohort"), label = "First Transaction Month", choices = sort(unique(order.table.describe$month)), multiple = TRUE, selected = min(order.table.describe$month), width = "100%"))
     ), style = "color: #ffffff"),
     fluidRow(div(
-      column(width = 3, radioButtons(inputId = ns("quantileMinSelector"), label = "最小分位数", choices = list("0%" = 0, "1%" = 0.01, "5%" = 0.05), inline = TRUE)),
-      column(width = 3, radioButtons(inputId = ns("quantileMaxSelector"), label = "最大分位数", choices = list("100%" = 1, "99%" = 0.99, "95%" = 0.95), inline = TRUE))
+      column(width = 3, radioButtons(inputId = ns("quantileMinSelector"), label = "Minimum Percentile", choices = list("0%" = 0, "1%" = 0.01, "5%" = 0.05), inline = TRUE)),
+      column(width = 3, radioButtons(inputId = ns("quantileMaxSelector"), label = "Maximum Percentile", choices = list("100%" = 1, "99%" = 0.99, "95%" = 0.95), inline = TRUE))
     ), style = "color: #ffffff"),
     fluidRow(
-      column(width=12, actionButton(inputId=ns("run"), label = "运行", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))
+      column(width=12, actionButton(inputId=ns("run"), label = "RUN", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))
     ),
     fluidRow(
       column(width = 6, highchartOutput(outputId = ns("distFirstRecent"), height = "400px")),
@@ -104,10 +104,10 @@ initRfmInsight <- function(input, output, session, order.table.describe, first.s
       hc_legend(enabled=TRUE) %>%
       hc_xAxis(title=list(text=""), tickLength=0) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="顾客数: {point.y}") %>%
-      hc_title(text=list("首单日期与末单日期天数差"), style=list(color="#ffffff")) %>%
-      hc_subtitle(text=list("天数差 > 0")) %>%
-      hc_exporting(enabled=TRUE, filename="首单日期与末单日期天数差", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="Number of Customers: {point.y}") %>%
+      hc_title(text=list("Difference Between First and Last Transaction Date"), style=list(color="#ffffff")) %>%
+      hc_subtitle(text=list("Difference of days > 0")) %>%
+      hc_exporting(enabled=TRUE, filename="Difference Between First and Last Transaction Date", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -119,10 +119,10 @@ initRfmInsight <- function(input, output, session, order.table.describe, first.s
       hc_legend(enabled=TRUE) %>%
       hc_xAxis(title=list(text=""), tickLength=0) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="顾客数: {point.y}") %>%
-      hc_title(text=list("首单日期与校准日期天数差"), style=list(color="#ffffff")) %>%
-      hc_subtitle(text=list(paste0("天数差 > 0, 校准日期: ", last.date))) %>%
-      hc_exporting(enabled=TRUE, filename="首单日期与校准日期天数差", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="Number of Customers: {point.y}") %>%
+      hc_title(text=list("Difference Between First Transaction and Calibration Date"), style=list(color="#ffffff")) %>%
+      hc_subtitle(text=list(paste0("Difference of days > 0, Calibration Date: ", last.date))) %>%
+      hc_exporting(enabled=TRUE, filename="Difference Between First Transaction and Calibration Date", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -134,9 +134,9 @@ initRfmInsight <- function(input, output, session, order.table.describe, first.s
       hc_legend(enabled=TRUE) %>%
       hc_xAxis(title=list(text=""), tickLength=0) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="顾客数: {point.y}") %>%
-      hc_title(text=list("首单日期与第二单日期天数差"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="首单日期与第二单日期天数差", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="Number of Customers: {point.y}") %>%
+      hc_title(text=list("Difference Between First and Second Transaction Date"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Difference Between First and Second Transaction Date", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -148,7 +148,7 @@ initRfmInsight <- function(input, output, session, order.table.describe, first.s
       hc_legend(enabled=TRUE) %>%
       hc_xAxis(title=list(text=""), tickLength=0) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="顾客数: {point.y}") %>%
+      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="Number of Customers: {point.y}") %>%
       hc_title(text=list("Average Transaction Value"), style=list(color="#ffffff")) %>%
       hc_exporting(enabled=TRUE, filename="Average Transaction Value", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
@@ -162,9 +162,9 @@ initRfmInsight <- function(input, output, session, order.table.describe, first.s
       hc_legend(enabled=TRUE) %>%
       hc_xAxis(title=list(text=""), tickLength=0) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="顾客数: {point.y}") %>%
-      hc_title(text=list("购买次数"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="购买次数", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="Number of Customers: {point.y}") %>%
+      hc_title(text=list("Purchase Times"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Purchase Times", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 }

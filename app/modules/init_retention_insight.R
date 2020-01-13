@@ -11,14 +11,14 @@ initRetentionInsightUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(width=4, div(selectInput(inputId=ns("period"), label="留存周期", choices=retention.period.selection), style="color: #ffffff"))
+      column(width=4, div(selectInput(inputId=ns("period"), label="Retention Period", choices=retention.period.selection), style="color: #ffffff"))
     ),
     fluidRow(
-      column(width=4, div(selectInput(inputId=ns("retentionIsCohort"), label="是否显示所有首单月", choices=c("Yes", "No"), width="100%"), style="color: #ffffff")),
+      column(width=4, div(selectInput(inputId=ns("retentionIsCohort"), label="Show All First Transaction Months / Not Show All First Transaction Months", choices=c("Yes", "No"), width="100%"), style="color: #ffffff")),
       column(width=4, uiOutput(outputId=ns("reactiveRetentionCohort")))
     ),
     fluidRow(
-      column(width=4, div(selectInput(inputId=ns("retetnionIsDimension"), label="维度", choices=append("all", dimension), selected="all", width="100%"), style="color: #ffffff")),
+      column(width=4, div(selectInput(inputId=ns("retetnionIsDimension"), label="Dimension", choices=append("all", dimension), selected="all", width="100%"), style="color: #ffffff")),
       column(width=4, uiOutput(outputId=ns("reactiveRetentionDimension")))
     ),
     fluidRow(column(width=12, actionButton(inputId=ns("run"), label = "运行", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))),
@@ -38,7 +38,7 @@ initRetentionInsight <- function(input, output, session, retention.data) {
     if (input$retentionIsCohort == "Yes") {}
     else {
       ns <- session$ns
-      div(selectInput(inputId=ns("retentionCohort"), label="首单月", choices=sort(unique(retention.data$month)), multiple=TRUE, width="100%"), style="color: #ffffff")
+      div(selectInput(inputId=ns("retentionCohort"), label="First Transaction Month", choices=sort(unique(retention.data$month)), multiple=TRUE, width="100%"), style="color: #ffffff")
     }
   })
   
@@ -47,7 +47,7 @@ initRetentionInsight <- function(input, output, session, retention.data) {
     else {
       ns <- session$ns
       item.name.list <- setNames(item.name.table$item.name.id, item.name.table$item.name)
-      div(selectInput(inputId=ns("retentionDimension"), label="值", choices=item.name.list, selected="all", width="100%", multiple=TRUE), style="color: #ffffff")
+      div(selectInput(inputId=ns("retentionDimension"), label="Value", choices=item.name.list, selected="all", width="100%", multiple=TRUE), style="color: #ffffff")
     }
   })
 
@@ -119,8 +119,8 @@ initRetentionInsight <- function(input, output, session, retention.data) {
       hc_legend(enabled=TRUE) %>%
       hc_xAxis(title=list(text="")) %>%
       hc_yAxis(title=list(text=(""))) %>%
-      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="留存率: {point.y}") %>%
-      hc_title(text=list("同期留存曲线"), style=list(color="#ffffff")) %>%
+      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="Retention rate: {point.y}") %>%
+      hc_title(text=list("Retention Curve in Cohorts (First Trnsaction Month"), style=list(color="#ffffff")) %>%
       hc_exporting(enabled=TRUE, filename="Cohort Retention Rate", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })

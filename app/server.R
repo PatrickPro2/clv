@@ -6,5 +6,4 @@ server <- function(input, output, session) {
   clv.model.fitting.output <- callModule(clvModelFitting, "page5", order.table)
   callModule(clvTrend, "page6", clv.model.fitting.output)
   callModule(clv1stOrderCohort, "page7", clv.model.fitting.output, order.detail.table)
-  callModule(instruction, "page8")
 }

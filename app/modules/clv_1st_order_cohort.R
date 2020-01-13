@@ -6,12 +6,15 @@ clv1stOrderCohortUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(div(
-      column(width = 9, selectInput(inputId = ns("itemName"), label = "商品名称", choices = item.name, multiple = TRUE, selected = item.name, width = "100%")),
-      column(width = 3, radioButtons(inputId = ns("hideLastThreeMonth"), label = "是否隐藏最近3个月", choices = list("是" = 1, "否" = 0), inline = TRUE))
+      column(width = 9, selectInput(inputId = ns("itemName"), label = "Item Name", choices = item.name, multiple = TRUE, selected = item.name, width = "100%")),
+      column(width = 3, radioButtons(inputId = ns("hideLastThreeMonth"), label = "Hide the Last Three Months / Not Hide the Last Three Months", choices = list("Yes" = 1, "No" = 0), inline = TRUE))
     ), style = "color: #ffffff"),
     fluidRow(div(
-      column(width = 3, actionButton(inputId=ns("run"), label = "运行", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))
+      column(width = 3, actionButton(inputId=ns("run"), label = "RUN", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))
     ), style = "color: #ffffff"),
+    fluidRow(
+      column(width = 4, uiOutput(outputId=ns("reactiveHelpText")))
+    ),
     fluidRow(column(width = 12, highchartOutput(outputId=ns("firstOrderDetailSumCLV"), height="500px"))),
     fluidRow(column(width = 12, highchartOutput(outputId=ns("firstOrderDetailMeanCLV"), height="500px")))
   )
@@ -24,7 +27,12 @@ clv1stOrderCohort <- function(input, output, session, clv.model.fitting.output, 
   first.order.detail.clv <- reactiveValues(sum=NULL, mean=NULL)
   
   observeEvent(input$run, {
-    if (is.null(clv.model.fitting.output$clv.output.model())) return()
+    if (is.null(clv.model.fitting.output$clv.output.model())) {
+      output$reactiveHelpText <- renderUI({
+        div(helpText("Please run the model in module Model Fitting, and then this module will be activated."), style="color: #ffffff")
+      })
+      return()
+    }
     detail <- order.detail.table
     clv.selected <- clv.model.fitting.output$clv.output.model()
     detail <- order.detail.table[txn.id %in% clv.model.fitting.output$select.order.table()$txn.id]
@@ -53,9 +61,9 @@ clv1stOrderCohort <- function(input, output, session, clv.model.fitting.output, 
       hc_legend(enabled=TRUE) %>%
       hc_xAxis(title=list(text=""), categories=sort(unique(first.order.detail.clv$sum$clv.by.attribute))) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="总和: {point.y}") %>%
-      hc_title(text=list("首单购买商品顾客总CLV"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="首单购买商品顾客总CLV", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="Sum: {point.y}") %>%
+      hc_title(text=list("Total Customer Lifetime Value for Items in the first Transaction"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Total Customer Lifetime Value for Items in the first Transaction", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -67,9 +75,9 @@ clv1stOrderCohort <- function(input, output, session, clv.model.fitting.output, 
       hc_legend(enabled=TRUE) %>%
       hc_xAxis(title=list(text=""), categories=sort(unique(first.order.detail.clv$mean$clv.by.attribute))) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="均值: {point.y}") %>%
-      hc_title(text=list("首单购买商品顾客人均CLV"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="首单购买商品顾客人均CLV", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_tooltip(headerFormat="{series.name}<br>", pointFormat="Average: {point.y}") %>%
+      hc_title(text=list("Average Customer Lifetime Value for Items in the first Transaction"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Average Customer Lifetime Value for Items in the first Transaction", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 }

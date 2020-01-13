@@ -1,4 +1,3 @@
-
 attributes <- list("产品SKU" = "item.name", "产品数量" = "item.number", "产品原价" = "item.original.price", "产品摊销价" = "item.amortized.price", "商品ID" = "item.name.id")
 all.attributes <- append(list("首单周期" = "first.txn.time"), attributes)
 order.detail.table <- fread('../data/demo_order_detail.csv')

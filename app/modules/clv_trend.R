@@ -1,24 +1,27 @@
 # module ui
 clvTrendUI <- function(id) {
-  table.name <- c("首单月总CLV", "首单月人均CLV")
+  table.name <- c("Total CLV in First Transaction Months", "Average CLV in First Transaction Months")
 
   # set namespace via id
   ns <- NS(id)
   tagList(
     fluidRow(div(
-      column(width = 3, radioButtons(inputId = ns("quantileMinSelector"), label = "最小分位数", choices = list("0%" = 0, "1%" = 0.01, "5%" = 0.05), inline = TRUE)),
-      column(width = 3, radioButtons(inputId = ns("quantileMaxSelector"), label = "最大分位数", choices = list("100%" = 1, "99%" = 0.99, "95%" = 0.95), inline = TRUE)),
-      column(width = 3, radioButtons(inputId = ns("hideLastThreeMonth"), label = "是否隐藏最近3个月", choices = list("是" = 1, "否" = 0), inline = TRUE)),
+      column(width = 3, radioButtons(inputId = ns("quantileMinSelector"), label = "Minimum Percentile", choices = list("0%" = 0, "1%" = 0.01, "5%" = 0.05), inline = TRUE)),
+      column(width = 3, radioButtons(inputId = ns("quantileMaxSelector"), label = "Maximum Percentile", choices = list("100%" = 1, "99%" = 0.99, "95%" = 0.95), inline = TRUE)),
+      column(width = 3, radioButtons(inputId = ns("hideLastThreeMonth"), label = "Hide the Last Three Months / Not Hide the Last Three Months", choices = list("Yes" = 1, "No" = 0), inline = TRUE)),
       column(width = 3, actionButton(inputId=ns("run"), label = "运行", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))
     ), style = "color: #ffffff"),
+    fluidRow(
+      column(width = 4, uiOutput(outputId=ns("reactiveHelpText")))
+    ),
     fluidRow(
       column(width = 6, highchartOutput(outputId = ns("clvDist"), height = "400px")),
       column(width = 6, highchartOutput(outputId = ns("predictPrecisionCLV"), height = "400px"))
     ),
     fluidRow(div(
-      column(width = 2, selectInput(inputId = ns("tableName"), label = "图表名称", choices = table.name, width = "100%")),
+      column(width = 2, selectInput(inputId = ns("tableName"), label = "Chart Name", choices = table.name, width = "100%")),
       column(width = 4, uiOutput(outputId=ns("reactiveCohorts"))),
-      column(width = 2, radioButtons(inputId = ns("aggregation"), label = "运算法则", choices = list("求和" = "sum", "求均值" = "average"), inline = TRUE)),
+      column(width = 2, radioButtons(inputId = ns("aggregation"), label = "Aggregation Method", choices = list("Sum" = "sum", "Average" = "average"), inline = TRUE)),
       column(width = 2, uiOutput(outputId = ns("reactiveAgg")))
     ), style="color: #ffffff"),
     fluidRow(
@@ -38,10 +41,15 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
   clv.output.model <- reactiveValues(value=NULL)
   select.clv.cohort <- reactiveValues(value=NULL)
   select.total.txn.amount.cohort <- reactiveValues(value=NULL)
-  table.name.list <- list("首单月总CLV" = "sum.clv", "首单月人均CLV" = "avg.clv")
+  table.name.list <- list("Total CLV in First Transaction Months" = "sum.clv", "Average CLV in First Transaction Months" = "avg.clv")
 
   observeEvent(input$run, {
-    if (is.null(clv.model.fitting.output$clv.output.model())) return()
+    if (is.null(clv.model.fitting.output$clv.output.model())) {
+      output$reactiveHelpText <- renderUI({
+        div(helpText("Please run the model in module Model Fitting, and then this module will be activated."), style="color: #ffffff")
+      })
+      return()
+    }
 
     select.order.table.output <- clv.model.fitting.output$select.order.table()
     select.total.txn.amount.cohort$value <- select.order.table.output[
@@ -71,7 +79,7 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
 
     ns <- session$ns
     txn.year.month <- sort(unique(select.clv.cohort$value$clv.by.attribute))
-    div(selectInput(inputId = ns("cohorts"), label = "周期", choices = txn.year.month, multiple = TRUE, selected = txn.year.month, width = "100%"), style="color: #ffffff")
+    div(selectInput(inputId = ns("cohorts"), label = "Period", choices = txn.year.month, multiple = TRUE, selected = txn.year.month, width = "100%"), style="color: #ffffff")
   })
   
   output$reactiveAgg <- renderUI({
@@ -83,7 +91,7 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
     } else {
       result <- mean(select.clv.cohort$value[clv.by.attribute %in% input$cohorts][[colname]])
     }
-    paste0("聚合值: ", format(round(sum(result)), big.mark=","))
+    paste0("Aggregated Value: ", format(round(sum(result)), big.mark=","))
   })
 
   # 所有训练数据样本CLV的分布
@@ -99,9 +107,9 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
       hc_legend(enabled=FALSE) %>%
       hc_xAxis(tickLength=0, title=list(text="")) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_tooltip(pointFormat="顾客数: {point.y}") %>%
-      hc_title(text=list("CLV分布"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="CLV Distribution", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_tooltip(pointFormat="Number of Customers: {point.y}") %>%
+      hc_title(text=list("Customer Lifetime Value Distribution"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Customer Lifetime Value Distribution", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -113,13 +121,13 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
     predict.precision.clv <- data.table(clv=lapply(clv.output.model$value[, c(paste0("clv", 1:predict.period.length)), with=FALSE], sum))
     highchart() %>%
       hc_chart(type="column") %>%
-      hc_series(list(name="CLV", type="column", zIndex=2, tooltip=list(headerFormat="CLV<br>", pointFormat="总和: ¥ {point.y:.2f}"), data=predict.precision.clv$clv)) %>%
+      hc_series(list(name="CLV", type="column", zIndex=2, tooltip=list(headerFormat="CLV<br>", pointFormat="Sum: ¥ {point.y:.2f}"), data=predict.precision.clv$clv)) %>%
       hc_legend(enabled=FALSE) %>%
-      hc_xAxis(title=list(text=""), categories=c(paste0("周期 ", 1:predict.period.length))) %>%
+      hc_xAxis(title=list(text=""), categories=c(paste0("Period ", 1:predict.period.length))) %>%
       hc_yAxis(title=list(text="")) %>%
       hc_tooltip(headerFormat="", pointFormat="CLV: ¥ {point.x:.2f}") %>%
-      hc_title(text=list("未来周期总CLV"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="未来周期总CLV", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Total Customer Lifetime Value in the Future Periods"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Total Customer Lifetime Value in the Future Periods", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -129,12 +137,12 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
 
     highchart() %>%
       hc_chart(type="column") %>%
-      hc_series(list(name="CLV", type="column", zIndex=2, tooltip=list(headerFormat="CLV<br>", pointFormat="总和: ¥ {point.y:.2f}"), data=select.clv.cohort$value$sum.clv)) %>%
+      hc_series(list(name="CLV", type="column", zIndex=2, tooltip=list(headerFormat="CLV<br>", pointFormat="Sum: ¥ {point.y:.2f}"), data=select.clv.cohort$value$sum.clv)) %>%
       hc_legend(enabled=FALSE) %>%
       hc_xAxis(title=list(text=""), categories=select.clv.cohort$value$clv.by.attribute) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_title(text=list("首单月总CLV"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="首单月总CLV", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Total Customer Lifetime Value in the First Transaction Months"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Total Customer Lifetime Value in the First Transaction Months", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -144,12 +152,12 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
 
     highchart() %>%
       hc_chart(type="column") %>%
-      hc_series(list(name="CLV", type="column", zIndex=2, tooltip=list(headerFormat="CLV<br>", pointFormat="均值: ¥ {point.y:.2f}"), data=select.clv.cohort$value$avg.clv)) %>%
+      hc_series(list(name="CLV", type="column", zIndex=2, tooltip=list(headerFormat="CLV<br>", pointFormat="Average: ¥ {point.y:.2f}"), data=select.clv.cohort$value$avg.clv)) %>%
       hc_legend(enabled=FALSE) %>%
       hc_xAxis(title=list(text=""), categories=select.clv.cohort$value$clv.by.attribute) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_title(text=list("首单月人均CLV"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="首单月人均CLV", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Average Customer Lifetime Value in the First Transaction Months"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Average Customer Lifetime Value in the First Transaction Months", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -160,13 +168,13 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
     highchart() %>%
       hc_chart(type="line") %>%
       hc_series(
-        list(name="销售额", type="line", yAxis=0, tooltip=(list(headerFormat="销售额<br>", pointFormat="总和: ¥ {point.y:.2f}")), data=select.total.txn.amount.cohort$value$total.txn.amount),
-        list(name="CLV", type="line", yAxis=1, tooltip=(list(headerFormat="CLV<br>", pointFormat="总和: ¥ {point.y:.2f}")), data=select.clv.cohort$value$sum.clv)
+        list(name="Sales", type="line", yAxis=0, tooltip=(list(headerFormat="Sales<br>", pointFormat="Sum: ¥ {point.y:.2f}")), data=select.total.txn.amount.cohort$value$total.txn.amount),
+        list(name="CLV", type="line", yAxis=1, tooltip=(list(headerFormat="CLV<br>", pointFormat="Sum: ¥ {point.y:.2f}")), data=select.clv.cohort$value$sum.clv)
       ) %>%
       hc_xAxis(title=list(text=""), categories=select.clv.cohort$value$clv.by.attribute) %>%
       hc_yAxis_multiples(list(title=list(text="")), list(title=list(text=""), opposite=TRUE)) %>%
-      hc_title(text=list("首单月总销售额和总CLV"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="首单月总销售额和总CLV", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Total Sales and Customer Lifetime Value in the First Transaction Months"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Total Sales and Customer Lifetime Value in the First Transaction Months", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -177,13 +185,13 @@ clvTrend <- function(input, output, session, clv.model.fitting.output) {
     highchart() %>%
       hc_chart(type="line") %>%
       hc_series(
-        list(name="顾客数", type="line", yAxis=0, tooltip=(list(headerFormat="顾客数<br>", pointFormat="总数: {point.y}")), data=select.clv.cohort$value$customer),
-        list(name="CLV", type="line", yAxis=1, tooltip=(list(headerFormat="CLV<br>", pointFormat="均值: ¥ {point.y:.2f}")), data=select.clv.cohort$value$avg.clv)
+        list(name="Customers", type="line", yAxis=0, tooltip=(list(headerFormat="Number of Customers<br>", pointFormat="Sum: {point.y}")), data=select.clv.cohort$value$customer),
+        list(name="CLV", type="line", yAxis=1, tooltip=(list(headerFormat="CLV<br>", pointFormat="Average: ¥ {point.y:.2f}")), data=select.clv.cohort$value$avg.clv)
       ) %>%
       hc_xAxis(title=list(text=""), categories=select.clv.cohort$value$clv.by.attribute) %>%
       hc_yAxis_multiples(list(title=list(text="")), list(title=list(text=""), opposite=TRUE)) %>%
-      hc_title(text=list("首单月总顾客数和人均CLV"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="首单月总顾客数和人均CLV", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Total Customers and Customer Lifetime Value in the First Transaction Months"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Total Customers and Customer Lifetime Value in the First Transaction Months", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 }

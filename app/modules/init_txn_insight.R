@@ -1,8 +1,8 @@
 # module ui
 initTxnInsightUI <- function(id) {
   item.name <- sort(unique(order.detail.table$item.name))
-  table.name <- c("销售额", "订单数", "顾客数", "Average Transaction Value", "Average Customer Value")
-  customer.name <- c("全部顾客", "新客", "老客")
+  table.name <- c("Sales", "Orders", "Customers", "Average Transaction Value", "Average Customer Value")
+  customer.name <- c("All customers", "New customers", "Old customers")
   txn.year.month <- sort(unique(order.detail.table$txn.year.month))
 
   # set namespace via id
@@ -14,10 +14,10 @@ initTxnInsightUI <- function(id) {
       valueBoxOutput(outputId = ns("totalOrder"))
     ),
     fluidRow(div(
-      column(width = 2, selectInput(inputId = ns("tableName"), label = "图表名称", choices = table.name, width = "100%")),
-      column(width = 2, selectInput(inputId = ns("customerCategory"), label = "顾客类型", choices = customer.name, width = "100%")),
-      column(width = 4, selectInput(inputId = ns("cohorts"), label = "周期", choices = txn.year.month, multiple = TRUE, selected = txn.year.month, width = "100%")),
-      column(width = 2, radioButtons(inputId = ns("aggregation"), label = "运算法则", choices = list("求和" = "sum", "求均值" = "average"), inline = TRUE)),
+      column(width = 2, selectInput(inputId = ns("tableName"), label = "Chart Name", choices = table.name, width = "100%")),
+      column(width = 2, selectInput(inputId = ns("customerCategory"), label = "Category of Customer", choices = customer.name, width = "100%")),
+      column(width = 4, selectInput(inputId = ns("cohorts"), label = "Period", choices = txn.year.month, multiple = TRUE, selected = txn.year.month, width = "100%")),
+      column(width = 2, radioButtons(inputId = ns("aggregation"), label = "Aggregation Method", choices = list("Sum" = "sum", "Average" = "average"), inline = TRUE)),
       column(width = 2, uiOutput(outputId = ns("reactiveAgg")))
     ), style="color: #ffffff"),
     fluidRow(column(width = 12, highchartOutput(outputId = ns("sale"), height = "400px"))),
@@ -26,7 +26,7 @@ initTxnInsightUI <- function(id) {
     fluidRow(column(width = 6, highchartOutput(outputId = ns("customer"), height = "400px")),
              column(width = 6, highchartOutput(outputId = ns("acv"), height = "400px"))),
     fluidRow(div(
-      column(width = 12, selectInput(inputId = ns("itemName"), label = "商品名称", choices = item.name, multiple = TRUE, selected = item.name, width = "100%"))
+      column(width = 12, selectInput(inputId = ns("itemName"), label = "Item Name", choices = item.name, multiple = TRUE, selected = item.name, width = "100%"))
     ), style="color: #ffffff"),
     fluidRow(column(width = 12, highchartOutput(outputId = ns("dspItemPrice"), height = "400px")))
   )
@@ -37,13 +37,13 @@ initTxnInsightUI <- function(id) {
 initTxnInsight <- function(input, output, session, order.table, order.detail.table) {
   # 销售额、新客数、订单数
   output$totalAmount <- renderValueBox({
-    valueBox(paste0("¥ ", format(round(sum(order.table$txn.amount)), big.mark=",")), subtitle="销售额", icon=icon("coins"), width=3)
+    valueBox(paste0("¥ ", format(round(sum(order.table$txn.amount)), big.mark=",")), subtitle="Total Sales", icon=icon("coins"), width=3)
   })
   output$totalCustomer <- renderValueBox({
-    valueBox(paste0(format(round(n_distinct(order.table$customer.id)), big.mark=",")), subtitle="顾客数", icon=icon("user-friends"), width=3)
+    valueBox(paste0(format(round(n_distinct(order.table$customer.id)), big.mark=",")), subtitle="Total Customers", icon=icon("user-friends"), width=3)
   })
   output$totalOrder <- renderValueBox({
-    valueBox(paste0(format(round(n_distinct(order.table$txn.id)), big.mark=",")), subtitle="订单数", icon=icon("copy"), width=3)
+    valueBox(paste0(format(round(n_distinct(order.table$txn.id)), big.mark=",")), subtitle="Total Orders", icon=icon("copy"), width=3)
   })
 
   # 所有顾客、新客、老客每个周期内的交易额、订单量、顾客数
@@ -72,13 +72,13 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
   order.table.groupby.year.month[is.na(average.customer.value.old.customer), average.customer.value.old.customer:=0]
 
   table.name.list <- list(
-    "销售额" = "total.txn.amount", "订单数" = "total.order", "顾客数" = "total.customer",
+    "Sales" = "total.txn.amount", "Orders" = "total.order", "Customers" = "total.customer",
     "Average Transaction Value" = "average.transaction.value",
     "Average Customer Value" = "average.customer.value")
   customer.name.list <- list(
-    "全部顾客" = "",
-    "新客" = ".new.customer",
-    "老客" = ".old.customer"
+    "All customers" = "",
+    "New customers" = ".new.customer",
+    "Old customers" = ".old.customer"
   )
 
   output$reactiveAgg <- renderUI({
@@ -89,7 +89,7 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
     } else {
       result <- mean(order.table.groupby.year.month[txn.year.month %in% input$cohorts][[colname]])
     }
-    paste0("聚合值: ", format(round(sum(result)), big.mark=","))
+    paste0("Aggregated Value: ", format(round(sum(result)), big.mark=","))
   })
 
   # 销售额时序图
@@ -97,13 +97,13 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
     highchart() %>%
       hc_chart(type="line") %>%
       hc_legend(enabled=TRUE) %>%
-      hc_add_series(name="全部顾客", data=order.table.groupby.year.month$total.txn.amount, tooltip=list(headerFormat="{series.name}<br>", pointFormat="销售额: ¥{point.y}")) %>%
-      hc_add_series(name="新客", data=order.table.groupby.year.month$total.txn.amount.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="销售额: ¥{point.y}")) %>%
-      hc_add_series(name="老客", data=order.table.groupby.year.month$total.txn.amount.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="销售额: ¥{point.y}")) %>%
+      hc_add_series(name="All customers", data=order.table.groupby.year.month$total.txn.amount, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Sales: ¥{point.y}")) %>%
+      hc_add_series(name="New customers", data=order.table.groupby.year.month$total.txn.amount.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Sales: ¥{point.y}")) %>%
+      hc_add_series(name="Old customers", data=order.table.groupby.year.month$total.txn.amount.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Sales: ¥{point.y}")) %>%
       hc_xAxis(categories=order.table.groupby.year.month$txn.year.month) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_title(text=list("销售额"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="Sale", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Sales"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Sales", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -112,13 +112,13 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
     highchart() %>%
       hc_chart(type="line") %>%
       hc_legend(enabled=TRUE) %>%
-      hc_add_series(name="全部顾客", data=order.table.groupby.year.month$total.order, tooltip=list(headerFormat="{series.name}<br>", pointFormat="订单数: {point.y}")) %>%
-      hc_add_series(name="新客", data=order.table.groupby.year.month$total.order.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="订单数: {point.y}")) %>%
-      hc_add_series(name="老客", data=order.table.groupby.year.month$total.order.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="订单数: {point.y}")) %>%
+      hc_add_series(name="All customers", data=order.table.groupby.year.month$total.order, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Number of Orders: {point.y}")) %>%
+      hc_add_series(name="New customers", data=order.table.groupby.year.month$total.order.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Number of Orders: {point.y}")) %>%
+      hc_add_series(name="Old customers", data=order.table.groupby.year.month$total.order.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Number of Orders: {point.y}")) %>%
       hc_xAxis(categories=order.table.groupby.year.month$txn.year.month) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_title(text=list("订单数"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="Order", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Orders"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Orders", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -127,13 +127,13 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
     highchart() %>%
       hc_chart(type="line") %>%
       hc_legend(enabled=TRUE) %>%
-      hc_add_series(name="全部顾客", data=order.table.groupby.year.month$total.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="顾客数: {point.y}")) %>%
-      hc_add_series(name="新客", data=order.table.groupby.year.month$total.customer.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="顾客数: {point.y}")) %>%
-      hc_add_series(name="老客", data=order.table.groupby.year.month$total.customer.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="顾客数: {point.y}")) %>%
+      hc_add_series(name="All customers", data=order.table.groupby.year.month$total.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Number of Customers: {point.y}")) %>%
+      hc_add_series(name="New customers", data=order.table.groupby.year.month$total.customer.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Number of Customers: {point.y}")) %>%
+      hc_add_series(name="Old customers", data=order.table.groupby.year.month$total.customer.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="Number of Customers: {point.y}")) %>%
       hc_xAxis(categories=order.table.groupby.year.month$txn.year.month) %>%
       hc_yAxis(title=list(text="")) %>%
-      hc_title(text=list("顾客数"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="Customer", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Customers"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Customers", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme)
   })
 
@@ -142,9 +142,9 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
     highchart() %>%
       hc_chart(type="line") %>%
       hc_legend(enabled=TRUE) %>%
-      hc_add_series(name="全部顾客", data=order.table.groupby.year.month$average.transaction.value, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ATV: ¥{point.y}")) %>%
-      hc_add_series(name="新客", data=order.table.groupby.year.month$average.transaction.value.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ATV: ¥{point.y}")) %>%
-      hc_add_series(name="老客", data=order.table.groupby.year.month$average.transaction.value.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ATV: ¥{point.y}")) %>%
+      hc_add_series(name="All customers", data=order.table.groupby.year.month$average.transaction.value, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ATV: ¥{point.y}")) %>%
+      hc_add_series(name="New customers", data=order.table.groupby.year.month$average.transaction.value.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ATV: ¥{point.y}")) %>%
+      hc_add_series(name="Old customers", data=order.table.groupby.year.month$average.transaction.value.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ATV: ¥{point.y}")) %>%
       hc_xAxis(categories=order.table.groupby.year.month$txn.year.month) %>%
       hc_yAxis(title=list(text="")) %>%
       hc_title(text=list("Average Transaction Value"), style=list(color="#ffffff")) %>%
@@ -157,9 +157,9 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
     highchart() %>%
       hc_chart(type="line") %>%
       hc_legend(enabled=TRUE) %>%
-      hc_add_series(name="全部顾客", data=order.table.groupby.year.month$average.customer.value, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ACV: ¥{point.y}")) %>%
-      hc_add_series(name="新客", data=order.table.groupby.year.month$average.customer.value.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ACV: ¥{point.y}")) %>%
-      hc_add_series(name="老客", data=order.table.groupby.year.month$average.customer.value.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ACV: ¥{point.y}")) %>%
+      hc_add_series(name="All customers", data=order.table.groupby.year.month$average.customer.value, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ACV: ¥{point.y}")) %>%
+      hc_add_series(name="New customers", data=order.table.groupby.year.month$average.customer.value.new.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ACV: ¥{point.y}")) %>%
+      hc_add_series(name="Old customers", data=order.table.groupby.year.month$average.customer.value.old.customer, tooltip=list(headerFormat="{series.name}<br>", pointFormat="ACV: ¥{point.y}")) %>%
       hc_xAxis(categories=order.table.groupby.year.month$txn.year.month) %>%
       hc_yAxis(title=list(text="")) %>%
       hc_title(text=list("Average Customer Value"), style=list(color="#ffffff")) %>%
@@ -183,8 +183,8 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
       hc_add_series(name="Avg", data=item.price.description$AVERAGE, tooltip=list(headerFormat="{point.x}<br>", pointFormat="Avg: ¥{point.y:.2f}")) %>%
       hc_add_series(name="75th", data=item.price.description$`75th`, tooltip=list(headerFormat="{point.x}<br>", pointFormat="75th: ¥{point.y:.2f}")) %>%
       hc_xAxis(categories=item.price.description$item.name) %>%
-      hc_title(text=list("商品价格统计"), style=list(color="#ffffff")) %>%
-      hc_exporting(enabled=TRUE, filename="商品价格统计", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
+      hc_title(text=list("Item Price Description Analysis"), style=list(color="#ffffff")) %>%
+      hc_exporting(enabled=TRUE, filename="Item Price Description Analysis", buttons=list(contextButton=list(menuItems=c("downloadPNG", "downloadCSV")))) %>%
       hc_add_theme(customized.theme) %>%
       hc_colors(brewer.pal(dim(item.price.description)[1], "Blues"))
   })

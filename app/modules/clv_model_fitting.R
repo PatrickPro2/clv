@@ -3,21 +3,24 @@ clvModelFittingUI <- function(id) {
   # set namespace via id
   ns <- NS(id)
   tagList(
-    fluidRow(div(column(width = 4, h4("交易参数")), style = "color: #ffffff")),
+    fluidRow(div(column(width = 4, h4("Transaction Parameter")), style = "color: #ffffff")),
     fluidRow(div(
-      column(width = 3, dateRangeInput(inputId = ns("dateRange"), label = "日期范围", start = min(order.table$txn.date), end = max(order.table$txn.date))),
-      column(width = 3, sliderInput(inputId = ns("avgTicketRange"), label = "客单价范围", min = 0, max = max(order.table$txn.amount), value = c(1,max(order.table$txn.amount)/2))),
-      column(width = 3, numericInput(inputId = ns("maxRepurchase"), label = "最大复购次数", value = n_distinct(order.table$txn.date), min = 1, max = n_distinct(order.table$txn.date)))
+      column(width = 3, dateRangeInput(inputId = ns("dateRange"), label = "Date Range", start = min(order.table$txn.date), end = max(order.table$txn.date))),
+      column(width = 3, sliderInput(inputId = ns("avgTicketRange"), label = "Average Transaction Value Range", min = 0, max = max(order.table$txn.amount), value = c(1,max(order.table$txn.amount)/2))),
+      column(width = 3, numericInput(inputId = ns("maxRepurchase"), label = "Maximum Repurchase Times", value = n_distinct(order.table$txn.date), min = 1, max = n_distinct(order.table$txn.date)))
     ), style = "color: #ffffff"),
-    fluidRow(div(column(width = 4, h4("预测参数")), style = "color: #ffffff")),
+    fluidRow(div(column(width = 4, h4("Prediction Parameter")), style = "color: #ffffff")),
     fluidRow(div(
-      column(width = 3, numericInput(inputId = ns("predictPeriodLength"), label = "未来计算周期", value = 5, min = 1, max = 10)),
-      column(width = 3, radioButtons(inputId = ns("predictPrecision"), label = "预测精度", choices = list("年" = "year", "季度" = "quarter", "月" = "month"), inline = TRUE)),
-      column(width = 3, radioButtons(inputId = ns("discountRate"), label = "折现率", choices = list("5%" = "0.05", "10%" = "0.1", "15%" = "0.15", "20%" = "0.2"), inline = TRUE))
+      column(width = 3, numericInput(inputId = ns("predictPeriodLength"), label = "Length of Prediction", value = 5, min = 1, max = 10)),
+      column(width = 3, radioButtons(inputId = ns("predictPrecision"), label = "Period of Length", choices = list("By year" = "year", "By quarter" = "quarter", "By month" = "month"), inline = TRUE)),
+      column(width = 3, radioButtons(inputId = ns("discountRate"), label = "Discount Rate", choices = list("5%" = "0.05", "10%" = "0.1", "15%" = "0.15", "20%" = "0.2"), inline = TRUE))
     ), style = "color: #ffffff"),
     fluidRow(
-      column(width = 3, actionButton(inputId=ns("run"), label = "运行", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2")),
-      column(width = 3, actionButton(inputId = ns("clear"), label = "清除", icon = icon("trash-alt"), style="color: #ffffff; background-color: #1976d2"))
+      column(width = 3, actionButton(inputId=ns("run"), label = "RUN", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2")),
+      column(width = 3, actionButton(inputId = ns("clear"), label = "CLEAR", icon = icon("trash-alt"), style="color: #ffffff; background-color: #1976d2"))
+    ),
+    fluidRow(
+      column(width = 3, helpText("After click RUN, please wait for 30 seconds and results will appear."))
     ),
     fluidRow(column(width = 12, div(dataTableOutput(outputId = ns("dspTable"), height="300px"), style="color: #ffffff")))
   )
@@ -76,7 +79,7 @@ clvModelFitting <- function(input, output, session, order.table) {
   output$dspTable <- renderDataTable({
     if (is.null(clv.summary$table)) return()
 
-    rownames(clv.summary$table) <- c("首单日期与末单日期天数差", "复购次数", "ATV", "预计购买次数", "CLV")
+    rownames(clv.summary$table) <- c("Difference Between First and Last Transaction Date", "Repurchase Times", "Average Transaction Value", "Predicted Purchase Times", "Customer Lifetime Value")
     datatable(
       clv.summary$table,
       options = list(searching=FALSE, paging=FALSE, ordering=FALSE,info=FALSE)
