@@ -9,7 +9,7 @@ clvTrendUI <- function(id) {
       column(width = 3, radioButtons(inputId = ns("quantileMinSelector"), label = "Minimum Percentile", choices = list("0%" = 0, "1%" = 0.01, "5%" = 0.05), inline = TRUE)),
       column(width = 3, radioButtons(inputId = ns("quantileMaxSelector"), label = "Maximum Percentile", choices = list("100%" = 1, "99%" = 0.99, "95%" = 0.95), inline = TRUE)),
       column(width = 3, radioButtons(inputId = ns("hideLastThreeMonth"), label = "Hide the Last Three Months / Not Hide the Last Three Months", choices = list("Yes" = 1, "No" = 0), inline = TRUE)),
-      column(width = 3, actionButton(inputId=ns("run"), label = "运行", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))
+      column(width = 3, actionButton(inputId=ns("run"), label = "RUN", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))
     ), style = "color: #ffffff"),
     fluidRow(
       column(width = 4, uiOutput(outputId=ns("reactiveHelpText")))
