@@ -14,12 +14,12 @@ initRetentionInsightUI <- function(id) {
       column(width=4, div(selectInput(inputId=ns("period"), label="Retention Period", choices=retention.period.selection), style="color: #ffffff"))
     ),
     fluidRow(
-      column(width=4, div(selectInput(inputId=ns("retentionIsCohort"), label="Show All First Transaction Months / Not Show All First Transaction Months", choices=c("Yes", "No"), width="100%"), style="color: #ffffff")),
-      column(width=4, uiOutput(outputId=ns("reactiveRetentionCohort")))
+      column(width=6, div(selectInput(inputId=ns("retentionIsCohort"), label="Show All First Transaction Months / Not Show All First Transaction Months", choices=c("Yes", "No"), width="100%"), style="color: #ffffff")),
+      column(width=6, uiOutput(outputId=ns("reactiveRetentionCohort")))
     ),
     fluidRow(
-      column(width=4, div(selectInput(inputId=ns("retetnionIsDimension"), label="Dimension", choices=append("all", dimension), selected="all", width="100%"), style="color: #ffffff")),
-      column(width=4, uiOutput(outputId=ns("reactiveRetentionDimension")))
+      column(width=6, div(selectInput(inputId=ns("retetnionIsDimension"), label="Dimension", choices=append("all", dimension), selected="all", width="100%"), style="color: #ffffff")),
+      column(width=6, uiOutput(outputId=ns("reactiveRetentionDimension")))
     ),
     fluidRow(column(width=12, actionButton(inputId=ns("run"), label = "RUN", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))),
     fluidRow(column(width=12, highchartOutput(outputId=ns("retentionLine"), height="500px"))),
