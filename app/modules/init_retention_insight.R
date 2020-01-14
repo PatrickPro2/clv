@@ -21,7 +21,7 @@ initRetentionInsightUI <- function(id) {
       column(width=4, div(selectInput(inputId=ns("retetnionIsDimension"), label="Dimension", choices=append("all", dimension), selected="all", width="100%"), style="color: #ffffff")),
       column(width=4, uiOutput(outputId=ns("reactiveRetentionDimension")))
     ),
-    fluidRow(column(width=12, actionButton(inputId=ns("run"), label = "运行", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))),
+    fluidRow(column(width=12, actionButton(inputId=ns("run"), label = "RUN", icon = icon("paper-plane"), style="color: #ffffff; background-color: #1976d2"))),
     fluidRow(column(width=12, highchartOutput(outputId=ns("retentionLine"), height="500px"))),
     fluidRow(column(width=12, div(dataTableOutput(outputId=ns("retentionTable"), height="500px"), style="color: #ffffff")))
   )
