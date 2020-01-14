@@ -5,7 +5,7 @@ header <- dashboardHeader(
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem(text = "Initial Insight", tabName = "initInsight", icon = icon("chart-line"), startExpanded = TRUE,
-      menuSubItem(text = "Transaction", tabName = "initTxnInsight"),
+      menuSubItem(text = "All Transaction", tabName = "initTxnInsight"),
       menuSubItem(text = "First Transaction", tabName = "init1stOrderCohort"),
       menuSubItem(text = "Retention Analysis", tabName = "initRetentionInsight")
     ),
