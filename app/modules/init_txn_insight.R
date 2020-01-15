@@ -175,6 +175,7 @@ initTxnInsight <- function(input, output, session, order.table, order.detail.tab
       "75th"=quantile(item.amortized.price, 0.75),
       "AVERAGE"=mean(item.amortized.price)
     ), by=.(item.name)]
+    item.price.description <- item.price.description[order(item.name)]
     highchart() %>%
       hc_chart(type="column") %>%
       hc_legend(enabled=TRUE) %>%
