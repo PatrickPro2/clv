@@ -1,5 +1,5 @@
 header <- dashboardHeader(
-  title = "CLV-PatrickPro2"
+  title = "Demo by PatrickPro2"
 )
 
 sidebar <- dashboardSidebar(
@@ -29,7 +29,7 @@ body <- dashboardBody(
 )
 
 ui <- dashboardPage(
-  title = "Model Demo",
+  title = "CLV Model Demo",
   skin = "blue",
   header = header,
   sidebar = sidebar,
