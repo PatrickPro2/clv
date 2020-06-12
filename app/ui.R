@@ -1,5 +1,5 @@
 header <- dashboardHeader(
-  title = "CLV Model by PatrickPro2"
+  title = "CLV-PatrickPro2"
 )
 
 sidebar <- dashboardSidebar(
