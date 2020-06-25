@@ -20,7 +20,7 @@ clvModelFittingUI <- function(id) {
       column(width = 3, actionButton(inputId = ns("clear"), label = "CLEAR", icon = icon("trash-alt"), style="color: #ffffff; background-color: #1976d2"))
     ),
     fluidRow(
-      column(width = 3, helpText("After click RUN, please wait for 30 seconds and results will appear."))
+      column(width = 3, helpText("After click RUN, please wait for 60 seconds and results will appear."))
     ),
     fluidRow(column(width = 12, div(dataTableOutput(outputId = ns("dspTable"), height="300px"), style="color: #ffffff")))
   )
