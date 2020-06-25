@@ -1,2 +1,2 @@
-# model-dashboard-demo
-A model visualization dashboard demo programmed by R language.
+# CLV-dashboard-demo
+A CLV (customer lifetime value) model demo dashboard using R language.
