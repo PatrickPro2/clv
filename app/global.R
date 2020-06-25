@@ -10,8 +10,8 @@ library("shinydashboard")
 library("shinyjs")
 
 # Database connect
-library("DBI")
-library("RPostgreSQL")
+# library("DBI")
+# library("RPostgreSQL")
 
 # Data viz
 library("highcharter")
